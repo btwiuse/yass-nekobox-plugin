@@ -29,17 +29,12 @@ import java.io.FileNotFoundException
 class BinaryProvider : NativePluginProvider() {
     override fun populateFiles(provider: PathProvider) {
         provider.addPath("naive-plugin", 0b111101101)
-        provider.addPath("libyass_cli.so", 0b111101101)
     }
 
     override fun getExecutable() = context!!.applicationInfo.nativeLibraryDir + "/libnaive.so"
     override fun openFile(uri: Uri): ParcelFileDescriptor = when (uri.path) {
         "/naive-plugin" -> ParcelFileDescriptor.open(
             File(getExecutable()),
-            ParcelFileDescriptor.MODE_READ_ONLY
-        )
-        "/libyass_cli.so" -> ParcelFileDescriptor.open(
-            File(context!!.applicationInfo.nativeLibraryDir + "/libyass_cli.so"),
             ParcelFileDescriptor.MODE_READ_ONLY
         )
         else -> throw FileNotFoundException()
