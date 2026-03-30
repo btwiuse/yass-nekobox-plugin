@@ -3,10 +3,6 @@ name: Build and Release Plugin
 on:
   workflow_dispatch:
     inputs:
-      yass_version:
-        description: 'Yass CLI version to download (e.g. 1.22.1)'
-        required: true
-        default: '1.22.1'
       plugin_version:
         description: 'Plugin version (MUST include a hyphen, e.g. 1.22.1-1)'
         required: true
@@ -33,30 +29,13 @@ jobs:
       - name: Setup Android SDK
         uses: amyu/setup-android@v5
 
-      - name: Download Yass CLI
-        run: |
-          YASS_VER="${{ github.event.inputs.yass_version }}"
-
-          echo "Downloading Yass version $YASS_VER"
-
-          mkdir -p app/libs/arm64-v8a
-
-          wget -O yass_cli.tar.gz "https://github.com/hukeyue/yass/releases/download/${YASS_VER}/yass_cli-android-release-arm64-${YASS_VER}.tgz"
-
-          tar -xvf yass_cli.tar.gz
-
-          cp -i "yass-cli-android-release-arm64-${YASS_VER}/yass_cli" app/libs/arm64-v8a/libyass_cli.so
-
-          chmod +x app/libs/arm64-v8a/libyass_cli.so
-
-          rm -rf yass_cli.tar.gz "yass-cli-android-release-arm64-${YASS_VER}"
-
-      - name: Build Go Wrapper
+      - name: Build Go Binary
         env:
           GOOS: "android"
           GOARCH: "arm64"
           CGO_ENABLED: "0" 
         run: |
+          mkdir -p app/libs/arm64-v8a
           go build -ldflags="-s -w" -trimpath -o app/libs/arm64-v8a/libnaive.so main.go
 
       - name: Decode Keystore
