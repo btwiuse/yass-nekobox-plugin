@@ -64,7 +64,7 @@ func main() {
 		log.Fatalf("Failed to parse proxy config: %v", err)
 	}
 
-	go Sidecar(proxyCfg)
+	go Sidecar(&naive, proxyCfg)
 
 	server := socks5.NewServer(
 		socks5.WithDial(makeHTTPSConnectDialer(proxyCfg)),

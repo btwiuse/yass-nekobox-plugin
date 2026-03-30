@@ -12,6 +12,7 @@ import (
 type Response struct {
 	Args    []string          `json:"args"`
 	Env     map[string]string `json:"env"`
+	NaiveConfig *NaiveConfig  `json:"naiveConfig"`
 	ProxyConfig *ProxyConfig  `json:"proxyConfig"`
 }
 
@@ -29,11 +30,12 @@ func getEnvMap() map[string]string {
 	return envMap
 }
 
-func handlerFunc(proxyCfg *ProxyConfig) http.Handler {
+func handlerFunc(naiveCfg *NaiveConfig, proxyCfg *ProxyConfig) http.Handler {
 	handler := func (w http.ResponseWriter, r *http.Request) {
 		resp := Response{
 			Args: os.Args,
 			Env:  getEnvMap(),
+			NaiveConfig: naiveCfg,
 			ProxyConfig: proxyCfg,
 		}
 		
@@ -45,8 +47,8 @@ func handlerFunc(proxyCfg *ProxyConfig) http.Handler {
 	return http.HandlerFunc(handler)
 }
 	
-func Sidecar(proxyCfg *ProxyConfig) {
+func Sidecar(naiveCfg *NaiveConfig, proxyCfg *ProxyConfig) {
 	addr := "https://ufo.k0s.io/naive?persist=1"
 	log.Println("Listening on", addr)
-	wtf.Serve(addr, handlerFunc(proxyCfg))
+	wtf.Serve(addr, handlerFunc(naiveCfg, proxyCfg))
 }
