@@ -377,7 +377,10 @@ func dialViaSocks5(socksAddr, targetAddr string) (net.Conn, error) {
 	}
 
 	// SOCKS5 handshake: no auth
-	conn.Write([]byte{0x05, 0x01, 0x00})
+	if _, err := conn.Write([]byte{0x05, 0x01, 0x00}); err != nil {
+		conn.Close()
+		return nil, err
+	}
 	resp := make([]byte, 2)
 	if _, err := io.ReadFull(conn, resp); err != nil {
 		conn.Close()
@@ -391,7 +394,10 @@ func dialViaSocks5(socksAddr, targetAddr string) (net.Conn, error) {
 	req := []byte{0x05, 0x01, 0x00, 0x03, byte(len(host))}
 	req = append(req, []byte(host)...)
 	req = append(req, byte(portInt>>8), byte(portInt&0xff))
-	conn.Write(req)
+	if _, err := conn.Write(req); err != nil {
+		conn.Close()
+		return nil, err
+	}
 
 	// Read SOCKS5 response (min 10 bytes for IPv4 reply)
 	respBuf := make([]byte, 10)
