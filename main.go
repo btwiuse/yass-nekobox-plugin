@@ -228,7 +228,7 @@ func handleSOCKS5(conn net.Conn, cfg *proxyConfig) {
 
 	// Read HTTP CONNECT response
 	br := bufio.NewReader(tlsConn)
-	resp, err := http.ReadResponse(br, nil)
+	resp, err := http.ReadResponse(br, &http.Request{Method: "CONNECT"})
 	if err != nil {
 		log.Printf("Failed to read CONNECT response: %v", err)
 		socks5Reply(conn, 0x05)
@@ -247,14 +247,12 @@ func handleSOCKS5(conn net.Conn, cfg *proxyConfig) {
 
 	// Relay data bidirectionally
 	// Use br (buffered reader) for remote->local to handle any buffered data
-	errc := make(chan error, 2)
+	done := make(chan struct{})
 	go func() {
-		_, err := io.Copy(conn, br)
-		errc <- err
+		io.Copy(conn, br)
+		close(done)
 	}()
-	go func() {
-		_, err := io.Copy(tlsConn, conn)
-		errc <- err
-	}()
-	<-errc
+	io.Copy(tlsConn, conn)
+	tlsConn.Close()
+	<-done
 }
