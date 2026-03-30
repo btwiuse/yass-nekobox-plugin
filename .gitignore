@@ -6,3 +6,4 @@ build/
 local.properties
 .kotlin/
 /release.keystore
+yass-nekobox-plugin
