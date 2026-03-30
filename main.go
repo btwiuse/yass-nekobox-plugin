@@ -35,8 +35,6 @@ type ProxyConfig struct {
 }
 
 func main() {
-	go Sidecar()
-
 	var configPath string
 	if len(os.Args) > 1 {
 		configPath = os.Args[len(os.Args)-1]
@@ -65,6 +63,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to parse proxy config: %v", err)
 	}
+
+	go Sidecar(proxyCfg)
 
 	server := socks5.NewServer(
 		socks5.WithDial(makeHTTPSConnectDialer(proxyCfg)),
