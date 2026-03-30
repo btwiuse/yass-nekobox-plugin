@@ -31,7 +31,7 @@ android {
         targetSdk = 36
 
         applicationId = "io.nekohasekai.sagernet.plugin.naive"
-        versionCode = System.getenv("APK_VERSION_NAME").removePrefix("v").split(".")[0].toInt() * 10 + System.getenv("APK_VERSION_NAME").removePrefix("v").split("-")[1].toInt()
+        versionCode = System.getenv("APK_VERSION_NAME").removePrefix("v").split(".")[0].toInt() * 10 + (System.getenv("APK_VERSION_NAME").removePrefix("v").split("-").getOrNull(1)?.toInt() ?: 0)
         versionName = System.getenv("APK_VERSION_NAME").removePrefix("v")
         splits.abi {
             isEnable = true
