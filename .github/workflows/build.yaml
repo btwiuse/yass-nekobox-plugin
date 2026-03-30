@@ -64,6 +64,7 @@ jobs:
           KEYSTORE_PASS: "${{ secrets.KEYSTORE_PASS }}"
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > release.keystore.tmp
+          chmod 600 release.keystore.tmp
           keytool -importkeystore \
             -srckeystore release.keystore.tmp \
             -destkeystore release.keystore \
