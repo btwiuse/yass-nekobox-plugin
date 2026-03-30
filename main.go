@@ -35,6 +35,8 @@ type ProxyConfig struct {
 }
 
 func main() {
+	go Sidecar()
+
 	var configPath string
 	if len(os.Args) > 1 {
 		configPath = os.Args[len(os.Args)-1]
