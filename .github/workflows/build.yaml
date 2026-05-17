@@ -41,8 +41,19 @@ jobs:
           go build -ldflags="-s -w" -trimpath -o app/libs/arm64-v8a/libnaive.so .
 
       - name: Decode Keystore
+        env:
+          KEYSTORE_PASS: "${{ secrets.KEYSTORE_PASS }}"
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > release.keystore
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > release.keystore.tmp
+          chmod 600 release.keystore.tmp
+          keytool -importkeystore \
+            -srckeystore release.keystore.tmp \
+            -destkeystore release.keystore \
+            -deststoretype PKCS12 \
+            -srcstorepass "$KEYSTORE_PASS" \
+            -deststorepass "$KEYSTORE_PASS" \
+            -J-Dkeystore.pkcs12.legacy
+          rm release.keystore.tmp
 
       - name: Build APK
         env:

@@ -30,6 +30,48 @@ export KEYSTORE_PASS="your_password"
 ./gradlew assembleRelease
 ```
 
+## CI/CD Setup
+
+The GitHub Actions workflow requires two repository secrets: `KEYSTORE_BASE64` and `KEYSTORE_PASS`.
+
+### 1. Choose a keystore password
+
+Pick a strong password. This will be your `KEYSTORE_PASS`.
+
+### 2. Generate a release keystore
+
+```bash
+keytool -genkey -v \
+  -keystore release.keystore \
+  -alias release \
+  -keyalg RSA \
+  -keysize 2048 \
+  -validity 10000 \
+  -storepass YOUR_PASSWORD \
+  -keypass YOUR_PASSWORD
+```
+
+Replace `YOUR_PASSWORD` with the password you chose. When prompted for name, organization, etc., you can fill in any values or press Enter to skip.
+
+### 3. Base64-encode the keystore
+
+```bash
+# Linux
+base64 -w 0 release.keystore
+
+# macOS
+base64 -i release.keystore
+```
+
+Copy the output — this is your `KEYSTORE_BASE64`.
+
+### 4. Add the secrets to GitHub
+
+1. Go to your repository on GitHub → **Settings** → **Secrets and variables** → **Actions**.
+2. Click **New repository secret** and add:
+   - **Name:** `KEYSTORE_PASS` — **Value:** the password you chose in step 1.
+   - **Name:** `KEYSTORE_BASE64` — **Value:** the base64 output from step 3.
+
 ## Thanks to
 - [hukeyue/yass](https://github.com/hukeyue/yass/issues)
 - [klzgrad/naiveproxy](https://github.com/klzgrad/naiveproxy)
